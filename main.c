@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "bf-vm.h"
+
 FILE *fp;
 
 void parse(char *buf){
