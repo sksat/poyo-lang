@@ -48,7 +48,7 @@ STACK *addr_stack;
 void parse(char *buf){
 	int i;
 	char po[] = "ぽ";
-	printf("\nparse> buf=%s\n", buf-3);
+	printf("\nparse> buf=%s\n", buf);
 	
 //	printf("%d\n", strlen("よよっ"));
 	
@@ -84,7 +84,6 @@ void parse(char *buf){
 				}
 				
 				printf("token=%d\n", token);
-				
 				if(old_token != 0 && token != 0){
 					switch(old_token){
 					case 1:
@@ -97,9 +96,12 @@ void parse(char *buf){
 						if(token==3){
 							code = 5;
 							// push addr
-							uint8_t addr;
-							addr = vm_getpushmax() + 1;
+							uint8_t addr = vm_getpushmax()+2;
 							push_stack(addr_stack, addr);
+							vm_pushcode(vm, code);
+							vm_pushcode(vm, addr);
+							old_token = 0;
+							continue;
 						}
 						if(token==1) code = 8;
 						break;
@@ -109,9 +111,11 @@ void parse(char *buf){
 							code = 6;
 							vm_pushcode(vm, 6);
 							// pop addr
-							uint8_t addr;
+							uint8_t addr, addr2;
 							addr = pop_stack(addr_stack);
+							addr2= vm_getpushmax()+2;
 							vm_pushcode(vm, addr);
+							vm->codes[addr+1] = addr2;
 							old_token = 0;
 							continue;
 						}

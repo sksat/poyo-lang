@@ -14,7 +14,11 @@ uint8_t pushmax = 0;
 uint8_t vm_getpushmax(){
 	return pushmax-1;
 }
-
+/*
+void vm_editcode(BF_VM *vm, uint8_t addr, uint8_t code){
+	vm->codes
+}
+*/
 void vm_pushcode(BF_VM *vm, uint8_t code){
 	vm->codes[pushmax] = code;
 	pushmax++;
@@ -49,7 +53,9 @@ void vm_run(BF_VM *vm, uint8_t max_pc){
 			}
 			continue;
 		case 6:
-			vm->pc = vm->codes[vm->pc + 1];
+			if(vm->memory[vm->p] != 0){
+				vm->pc = vm->codes[vm->pc + 1];
+			}
 			continue;
 		case 7:
 			printf("input> ");
