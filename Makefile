@@ -2,7 +2,7 @@ TARGET	= poyo
 OBJS	= main.o bf-vm.o
 
 %.o:%.c
-	gcc -c $<
+	gcc -g -c $<
 
 default:
 	make $(TARGET)
