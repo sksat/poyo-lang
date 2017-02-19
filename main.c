@@ -11,8 +11,38 @@
 4 ぽや
 */
 
+#define DEFAULT_STACKSIZE	10
+
+typedef struct {
+	size_t  size;
+	uint8_t *base;
+	uint8_t sp;
+}STACK;
+
+STACK* init_stack(size_t size){
+	STACK *s = (STACK*)malloc(sizeof(STACK));
+	s->base  = (uint8_t*)malloc(sizeof(uint8_t) * size);
+	s->sp	 = 0;
+	return s;
+}
+
+int push_stack(STACK *s, uint8_t data){
+	if(s == NULL) return -1;
+	if(s->sp > s->size) return -1;
+	*(s->base + s->sp) = data;
+	s->sp++;
+}
+
+uint8_t pop_stack(STACK *s){
+	uint8_t ret;
+	ret = *(s->base + s->sp - 1);
+	return ret;
+}
+
 FILE *fp;
 BF_VM *vm;
+STACK *addr_stack;
+
 
 void parse(char *buf){
 	int i;
@@ -65,12 +95,25 @@ void parse(char *buf){
 						if(token==2) code = 4;
 						if(token==3){
 							code = 5;
+							// push addr
+							uint8_t addr;
+							addr = vm_getpushmax() + 1;
+							push_stack(addr_stack, addr);
 						}
 						if(token==1) code = 8;
 						break;
 					case 3:
 						if(token==1) code = 2;
-						if(token==2) code = 6;
+						if(token==2){
+							code = 6;
+							vm_pushcode(vm, 6);
+							// pop addr
+							uint8_t addr;
+							addr = pop_stack(addr_stack);
+							vm_pushcode(vm, addr);
+							old_token = 0;
+							continue;
+						}
 						break;
 					}
 					
@@ -87,6 +130,7 @@ void parse(char *buf){
 int main(int argc, char **argv){
 
 	vm = vm_init(DEFAULT_CODESIZE, DEFAULT_MEMSIZE);
+	addr_stack = init_stack(DEFAULT_STACKSIZE);
 
 	if(argc == 1){
 		fp = stdin;

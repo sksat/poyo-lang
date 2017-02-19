@@ -20,6 +20,7 @@ typedef struct {
 
 BF_VM* vm_init(size_t codesize, size_t memsize);
 void vm_pushcode(BF_VM *vm, uint8_t code);
+//uint8_t vm_now_codeaddr();
 uint8_t vm_getpushmax();
 void vm_run(BF_VM *vm, uint8_t max_pc);
 
