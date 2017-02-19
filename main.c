@@ -36,6 +36,7 @@ int push_stack(STACK *s, uint8_t data){
 uint8_t pop_stack(STACK *s){
 	uint8_t ret;
 	ret = *(s->base + s->sp - 1);
+	s->sp--;
 	return ret;
 }
 
@@ -115,11 +116,14 @@ void parse(char *buf){
 							continue;
 						}
 						break;
+					default:
+						break;
 					}
 					
 					printf("code=%d\n", code);
 					vm_pushcode(vm, code);
 					old_token = 0;
+					continue;
 				}
 				old_token = token;
 			}
