@@ -1,15 +1,16 @@
 #include "bf-vm.h"
 
+uint8_t pushmax;
+
 BF_VM* vm_init(size_t codesize, size_t memsize){
 	BF_VM *vm = (BF_VM*)malloc(sizeof(BF_VM));
 	vm->pc = 0x00;
 	vm->p  = 0x00;
 	vm->codes  = (uint8_t*)malloc(sizeof(uint8_t) * codesize);
 	vm->memory = (uint8_t*)malloc(sizeof(uint8_t) * memsize);
+	pushmax = 0;
 	return vm;
 }
-
-uint8_t pushmax = 0;
 
 uint8_t vm_getpushmax(){
 	return pushmax-1;
@@ -31,6 +32,7 @@ void vm_run(BF_VM *vm, uint8_t max_pc){
 	}
 	if(max_pc == 0x00) return;
 	while(vm->pc <= max_pc){
+//		printf("pc = %x code = %d\n", vm->pc, vm->codes[vm->pc]);
 		switch(vm->codes[vm->pc]){
 		case 0:
 			printf("exit.\n");
@@ -50,13 +52,13 @@ void vm_run(BF_VM *vm, uint8_t max_pc){
 		case 5:
 			if(vm->memory[vm->p] == 0){
 				vm->pc = vm->codes[vm->pc + 1];
+				continue;
 			}
-			continue;
 		case 6:
 			if(vm->memory[vm->p] != 0){
 				vm->pc = vm->codes[vm->pc + 1];
+				continue;
 			}
-			continue;
 		case 7:
 			printf("input> ");
 			vm->memory[vm->p] = getchar();

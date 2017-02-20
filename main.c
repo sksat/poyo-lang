@@ -11,6 +11,8 @@
 4 ぽや
 */
 
+//#define DEBUG
+
 #define DEFAULT_STACKSIZE	10
 
 typedef struct {
@@ -48,7 +50,9 @@ STACK *addr_stack;
 void parse(char *buf){
 	int i;
 	char po[] = "ぽ";
-	printf("\nparse> buf=%s\n", buf);
+#ifdef DEBUG
+//	printf("\nparse> buf=%s\n", buf);
+#endif
 	
 //	printf("%d\n", strlen("よよっ"));
 	
@@ -63,9 +67,9 @@ void parse(char *buf){
 				i+=3;
 				int token = 0;
 				uint8_t code = 0;
-				
-				printf("ぽを検出:%s\n", buf+i-3);
-				
+#ifdef DEBUG				
+	//			printf("ぽを検出:%s\n", buf+i-3);
+#endif
 				if(strncmp(&buf[i], "よよ〜ん", 12) == 0){
 					token = 1;
 					i+=(12-1);
@@ -82,8 +86,9 @@ void parse(char *buf){
 					old_token = 0;
 					continue;
 				}
-				
-				printf("token=%d\n", token);
+#ifdef DEBUG				
+//				printf("token=%d\n", token);
+#endif
 				if(old_token != 0 && token != 0){
 					switch(old_token){
 					case 1:
@@ -98,8 +103,11 @@ void parse(char *buf){
 							// push addr
 							uint8_t addr = vm_getpushmax()+2;
 							push_stack(addr_stack, addr);
+#ifdef DEBUG
+							printf("push %d\n", addr);
+#endif
 							vm_pushcode(vm, code);
-							vm_pushcode(vm, addr);
+							vm_pushcode(vm, 0);
 							old_token = 0;
 							continue;
 						}
@@ -113,9 +121,13 @@ void parse(char *buf){
 							// pop addr
 							uint8_t addr, addr2;
 							addr = pop_stack(addr_stack);
-							addr2= vm_getpushmax()+2;
+							addr2= vm_getpushmax();
+#ifdef DEBUG
+							printf("pop: %d\n", addr);
+#endif
 							vm_pushcode(vm, addr);
-							vm->codes[addr+1] = addr2;
+							if(vm->codes[addr] != 0) printf("えっなんで%d\n", vm->codes[addr]);
+							vm->codes[addr] = addr2;
 							old_token = 0;
 							continue;
 						}
@@ -123,8 +135,9 @@ void parse(char *buf){
 					default:
 						break;
 					}
-					
+#ifdef DEBUG
 					printf("code=%d\n", code);
+#endif
 					vm_pushcode(vm, code);
 					old_token = 0;
 					continue;
@@ -150,7 +163,7 @@ int main(int argc, char **argv){
 		}
 	}
 	
-	printf("> ");
+	if(fp == stdin) printf("> ");
 	
 	char buf[256];
 	int p=0;
@@ -168,7 +181,9 @@ int main(int argc, char **argv){
 		if(c == '\n'){
 			buf[p-1] = '\0';
 			parse(buf);
-			vm_run(vm, vm_getpushmax());
+			if(addr_stack->sp == 0){
+				vm_run(vm, vm_getpushmax());
+			}
 next_line:
 			memset(buf, '\0', 256);
 			p = 0;
