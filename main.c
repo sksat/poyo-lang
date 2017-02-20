@@ -45,7 +45,7 @@ uint8_t pop_stack(STACK *s){
 FILE *fp;
 BF_VM *vm;
 STACK *addr_stack;
-
+char  *prompt;
 
 void parse(char *buf){
 	int i;
@@ -153,6 +153,8 @@ int main(int argc, char **argv){
 	vm = vm_init(DEFAULT_CODESIZE, DEFAULT_MEMSIZE);
 	addr_stack = init_stack(DEFAULT_STACKSIZE);
 
+	prompt = ">>> ";
+
 	if(argc == 1){
 		fp = stdin;
 	}else{
@@ -163,7 +165,7 @@ int main(int argc, char **argv){
 		}
 	}
 	
-	if(fp == stdin) printf("> ");
+	if(fp == stdin) printf("%s ", prompt);
 	
 	char buf[256];
 	int p=0;
@@ -182,12 +184,15 @@ int main(int argc, char **argv){
 			buf[p-1] = '\0';
 			parse(buf);
 			if(addr_stack->sp == 0){
+				prompt = ">>> ";
 				vm_run(vm, vm_getpushmax());
+			}else{
+				prompt = "... ";
 			}
 next_line:
 			memset(buf, '\0', 256);
 			p = 0;
-			if(fp == stdin) printf("> ");
+			if(fp == stdin) printf("%s ", prompt);
 		}
 		if(c == EOF) return 0;
 	}
