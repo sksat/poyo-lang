@@ -11,7 +11,7 @@
 4 ぽや
 */
 
-//#define DEBUG
+#define DEBUG
 
 #define DEFAULT_STACKSIZE	10
 
