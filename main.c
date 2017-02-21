@@ -15,6 +15,11 @@
 
 #define DEFAULT_STACKSIZE	10
 
+#define RUN_MODE	0x01
+#define INTERPRET_MODE	0x02
+#define CODESAVE_MODE	0x04
+#define COMPILE_MODE	0x08
+
 typedef struct {
 	size_t  size;
 	uint8_t *base;
@@ -46,6 +51,7 @@ FILE *fp;
 BF_VM *vm;
 STACK *addr_stack;
 char  *prompt;
+char  EXEC_MODE;
 
 void parse(char *buf){
 	int i;
@@ -150,6 +156,8 @@ void parse(char *buf){
 
 int main(int argc, char **argv){
 
+	EXEC_MODE	= 0x00;
+
 	vm = vm_init(DEFAULT_CODESIZE, DEFAULT_MEMSIZE);
 	addr_stack = init_stack(DEFAULT_STACKSIZE);
 
@@ -157,6 +165,7 @@ int main(int argc, char **argv){
 
 	if(argc == 1){
 		fp = stdin;
+		EXEC_MODE |= RUN_MODE;
 	}else{
 		fp = fopen(argv[1], "r");
 		if(fp == NULL){
@@ -183,7 +192,7 @@ int main(int argc, char **argv){
 		if(c == '\n'){
 			buf[p-1] = '\0';
 			parse(buf);
-			if(addr_stack->sp == 0){
+			if(addr_stack->sp == 0 && (EXEC_MODE & RUN_MODE)!=0){
 				prompt = ">>> ";
 				vm_run(vm, vm_getpushmax());
 			}else{
