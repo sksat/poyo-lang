@@ -60,7 +60,7 @@ void vm_run(BF_VM *vm, uint8_t max_pc){
 				continue;
 			}
 		case 7:
-			printf("input> ");
+//			printf("input> ");
 			vm->memory[vm->p] = getchar();
 			break;
 		case 8:

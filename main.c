@@ -15,7 +15,7 @@
 
 #define DEFAULT_STACKSIZE	10
 
-#define RUN_MODE	0x01
+#define RUN_MODE	0x00
 #define INTERPRET_MODE	0x02
 #define CODESAVE_MODE	0x04
 #define COMPILE_MODE	0x08
@@ -192,7 +192,7 @@ int main(int argc, char **argv){
 		if(c == '\n'){
 			buf[p-1] = '\0';
 			parse(buf);
-			if(addr_stack->sp == 0 && (EXEC_MODE & RUN_MODE)!=0){
+			if(addr_stack->sp == 0 /*&& (EXEC_MODE & RUN_MODE)!=0*/){
 				prompt = ">>> ";
 				vm_run(vm, vm_getpushmax());
 			}else{
